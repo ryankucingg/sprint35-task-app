@@ -40,17 +40,13 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Buat database-nya terlebih dahulu (migrasi tidak membuat database otomatis):
-
-```sql
-CREATE DATABASE sprint35_taskapp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
 ### 3. Migrasi & Seed Database
 
 ```bash
 php artisan migrate:fresh --seed
 ```
+
+> Database pada `DB_DATABASE` dibuat **otomatis** saat migrasi pertama kali dijalankan (charset `utf8mb4`) — asalkan user database memiliki hak `CREATE`. Tidak perlu membuat database secara manual.
 
 ### 4. Build Aset Frontend
 
