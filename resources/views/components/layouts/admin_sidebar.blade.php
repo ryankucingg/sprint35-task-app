@@ -33,7 +33,6 @@
                     @include('livewire.admin.alltask.alltask_nav')
                     @include('livewire.admin.category.category_nav')
                     @include('livewire.admin.user.user_nav')
-                    @include('livewire.admin.setting.setting_nav')
                 </ul>
             </div>
         @endif
