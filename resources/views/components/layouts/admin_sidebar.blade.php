@@ -18,6 +18,7 @@
             <span class="menu-title text-gray-500">Menu</span>
             <ul class="nav-list menu space-y-4 px-4 mt-4 w-full">
                 <x-ui.navigation-item session-active="admin-dashboard" link="{{ route('admin.dashboard') }}" name="Dashboard" icon="dashboard"/>
+                @include('livewire.task.task_nav')
             </ul>
         </div>
 
@@ -27,6 +28,8 @@
             <div class="menu-group -mx-4">
                 <span class="menu-title text-gray-500">Administrator</span>
                 <ul class="nav-list menu space-y-4 mb-12 px-4 mt-4 w-full">
+                    @include('livewire.admin.alltask.alltask_nav')
+                    @include('livewire.admin.category.category_nav')
                     @include('livewire.admin.user.user_nav')
                     @include('livewire.admin.setting.setting_nav')
                 </ul>

@@ -56,7 +56,7 @@ return [
     |   Each key maps to raw HTML (SVG, icon font class, etc).
     |
     */
-    'icon_set' => 'default',
+    'icon_set' => 'material',
 
     /*
     |--------------------------------------------------------------------------

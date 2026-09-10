@@ -2,22 +2,261 @@
     <title>Dashboard - {{ config('site.name') }}</title>
 @endpush
 
-<div class="grid-row p-6">
+@php
+    $cards = [
+        ['Total Tugas', $stats['total'], 'checklist', 'text-primary', null],
+        ['Belum Dimulai', $stats['belum'], 'schedule', 'text-base-content/60', null],
+        ['Dikerjakan', $stats['dikerjakan'], 'autorenew', 'text-warning', null],
+        ['Selesai', $stats['selesai'], 'task_alt', 'text-success', null],
+        ['Terlambat', $stats['terlambat'], 'event_busy', 'text-error', $stats['terlambat'] > 0 ? 'Lewat tenggat waktu' : null],
+        ['Mendekati Tenggat', $stats['segera'], 'hourglass_top', 'text-info', $stats['segera'] > 0 ? '7 hari ke depan' : null],
+    ];
+
+    $toneMap = [
+        'error' => ['bg' => 'bg-error/10', 'text' => 'text-error'],
+        'warning' => ['bg' => 'bg-warning/10', 'text' => 'text-warning'],
+        'info' => ['bg' => 'bg-info/10', 'text' => 'text-info'],
+    ];
+@endphp
+
+<div class="grid-row p-4 sm:p-6">
 
     @include('mrcatz::components.ui.breadcrumbs')
 
-    <div class="flex items-center justify-center min-h-[50vh]">
-        <div class="text-center">
-            <div class="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <span class="material-icons text-primary" style="font-size: 40px;">verified_user</span>
-            </div>
-            <h2 class="text-2xl font-bold text-base-content mb-2">Ini adalah halaman admin</h2>
-            <p class="text-base-content/50 mb-4">
-                Selamat datang, <span class="font-semibold text-primary">{{ auth()->user()->name }}</span>!
-                Anda login sebagai <span class="badge badge-sm badge-primary text-white uppercase">{{ str_replace('-', ' ', auth()->user()->role) }}</span>
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-4">
+        <div>
+            <h1 class="text-2xl font-bold text-base-content">Halo, {{ auth()->user()->name }}</h1>
+            <p class="text-sm text-base-content/50 mt-1">
+                Ringkasan tugas Anda hari ini, {{ now()->locale('id')->translatedFormat('l, d F Y') }}
             </p>
-            <p class="text-base-content/40 text-sm">Halaman ini akan dikembangkan lebih lanjut.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            @if(auth()->user()->isSuperAdmin())
+                <a href="{{ route('admin.all-tasks') }}" class="btn btn-ghost btn-sm gap-1.5">
+                    <span class="material-symbols-outlined text-base">assignment</span>
+                    Semua Tugas
+                </a>
+            @endif
+            <a href="{{ route('admin.tasks') }}" class="btn btn-primary btn-sm gap-1.5">
+                <span class="material-symbols-outlined text-base">checklist</span>
+                Kelola Tugas Saya
+            </a>
         </div>
     </div>
 
+    @if($stats['total'] === 0)
+        <div class="card bg-base-100 shadow-sm border border-base-200">
+            <div class="card-body items-center text-center py-14">
+                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary" style="font-size: 32px;">checklist</span>
+                </div>
+                <h3 class="text-lg font-bold text-base-content">Belum ada tugas</h3>
+                <p class="text-sm text-base-content/50 mb-4 max-w-sm">
+                    Mulai catat pekerjaan Anda — tetapkan prioritas dan tenggat waktu agar mudah dipantau.
+                </p>
+                <a href="{{ route('admin.tasks') }}" class="btn btn-primary btn-sm gap-1.5">
+                    <span class="material-symbols-outlined text-base">add_task</span>
+                    Tambah Tugas Pertama
+                </a>
+            </div>
+        </div>
+    @else
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-5">
+            @foreach($cards as [$label, $value, $icon, $color, $sub])
+                <div class="card bg-base-100 shadow-sm border border-base-200">
+                    <div class="card-body p-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-semibold uppercase tracking-wide text-base-content/50 leading-snug">{{ $label }}</span>
+                            <span class="material-symbols-outlined {{ $color }} shrink-0">{{ $icon }}</span>
+                        </div>
+                        <div class="text-3xl font-extrabold mt-1 text-base-content">{{ $value }}</div>
+                        @if($sub)
+                            <div class="text-[11px] text-base-content/50 leading-snug">{{ $sub }}</div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-5">
+            <div class="lg:col-span-2 card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body p-4 sm:p-5">
+                    <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-base">donut_large</span>
+                        Distribusi Status
+                    </h3>
+                    <div id="status-donut"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body p-4 sm:p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-base">hourglass_top</span>
+                            Tugas Mendekati Tenggat
+                        </h3>
+                        <a href="{{ route('admin.tasks') }}" class="btn btn-ghost btn-xs text-base-content/50">
+                            Lihat semua
+                        </a>
+                    </div>
+
+                    @if($upcoming->isEmpty())
+                        <div class="flex flex-col items-center justify-center py-10 text-center">
+                            <span class="material-symbols-outlined text-success/60 mb-2" style="font-size: 36px;">celebration</span>
+                            <p class="text-sm text-base-content/50">Tidak ada tugas mendekati tenggat. Kerja rapi!</p>
+                        </div>
+                    @else
+                        <ul class="divide-y divide-base-content/5">
+                            @foreach($upcoming as $task)
+                                @php $tone = $toneMap[$task->tone]; @endphp
+                                <li class="py-2.5 first:pt-0 last:pb-0 flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg {{ $tone['bg'] }} {{ $tone['text'] }} flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-lg">{{ $task->tone === 'error' ? 'event_busy' : 'schedule' }}</span>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-sm font-medium text-base-content truncate">{{ $task->title }}</p>
+                                        <p class="text-xs text-base-content/50 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                            <span class="{{ $tone['text'] }} font-semibold">{{ $task->relative }}</span>
+                                            <span class="text-base-content/30">•</span>
+                                            <span>{{ $task->due_label }}</span>
+                                            @if($task->category)
+                                                <span class="text-base-content/30">•</span>
+                                                <span>{{ $task->category }}</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <span class="badge {{ \App\Models\Task::priorityBadge($task->priority) }} badge-sm text-white whitespace-nowrap shrink-0">
+                                        {{ \App\Models\Task::PRIORITIES[$task->priority] ?? $task->priority }}
+                                    </span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        @if($perUser !== null)
+            <div class="card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body p-4 sm:p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-base">groups</span>
+                            Statistik Tugas per Pengguna
+                        </h3>
+                        <a href="{{ route('admin.all-tasks') }}" class="btn btn-ghost btn-xs text-base-content/50">
+                            Semua tugas
+                        </a>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="text-base-content/50 text-xs uppercase tracking-wide">
+                                    <th>Pengguna</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Belum</th>
+                                    <th class="text-center">Dikerjakan</th>
+                                    <th class="text-center">Selesai</th>
+                                    <th class="text-center">Terlambat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($perUser as $row)
+                                    <tr class="hover:bg-base-200/50">
+                                        <td>
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                                                    {{ strtoupper(substr($row->name, 0, 1)) }}
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-sm font-medium text-base-content truncate">{{ $row->name }}</p>
+                                                    <span class="text-[10px] uppercase text-base-content/40">{{ str_replace('-', ' ', $row->role) }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center font-semibold">{{ $row->total }}</td>
+                                        <td class="text-center"><span class="badge badge-neutral badge-sm">{{ $row->belum }}</span></td>
+                                        <td class="text-center"><span class="badge badge-warning badge-sm">{{ $row->dikerjakan }}</span></td>
+                                        <td class="text-center"><span class="badge badge-success badge-sm">{{ $row->selesai }}</span></td>
+                                        <td class="text-center">
+                                            @if($row->terlambat > 0)
+                                                <span class="badge badge-error badge-sm text-white">{{ $row->terlambat }}</span>
+                                            @else
+                                                <span class="text-base-content/30">—</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
+
 </div>
+
+@push('scripts')
+    @if($stats['total'] > 0)
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script>
+            (function () {
+                var el = document.getElementById('status-donut');
+                if (!el) return;
+                var data = @json($chart);
+
+                function isDark() {
+                    return (document.documentElement.getAttribute('data-theme') || '').includes('dark');
+                }
+
+                function render() {
+                    if (window.dashDonut) {
+                        window.dashDonut.destroy();
+                    }
+
+                    window.dashDonut = new ApexCharts(el, {
+                        chart: {
+                            type: 'donut',
+                            height: 265,
+                            fontFamily: 'inherit',
+                            background: 'transparent',
+                            toolbar: { show: false },
+                        },
+                        theme: { mode: isDark() ? 'dark' : 'light' },
+                        labels: data.labels,
+                        series: data.series,
+                        colors: ['#94a3b8', '#f59e0b', '#22c55e'],
+                        legend: { position: 'bottom', fontSize: '12px' },
+                        dataLabels: { enabled: true },
+                        stroke: { width: 0 },
+                        plotOptions: { pie: { donut: { size: '68%' } } },
+                        noData: { text: 'Belum ada tugas' },
+                    });
+                    window.dashDonut.render();
+                }
+
+                function boot() {
+                    render();
+                    new MutationObserver(render).observe(document.documentElement, {
+                        attributes: true,
+                        attributeFilter: ['data-theme'],
+                    });
+                }
+
+                if (window.ApexCharts) {
+                    boot();
+                } else {
+                    var check = setInterval(function () {
+                        if (window.ApexCharts) {
+                            clearInterval(check);
+                            boot();
+                        }
+                    }, 50);
+                }
+            })();
+        </script>
+    @endif
+@endpush
