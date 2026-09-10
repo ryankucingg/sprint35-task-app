@@ -12,8 +12,9 @@ use MrCatz\DataTable\MrCatzDataTablesComponent;
 class AllTaskTable extends MrCatzDataTablesComponent
 {
     public $showSearch = true;
-    public $showAddButton = false;
-    public $showBulkButton = false;
+    public $showAddButton = true;
+    public $bulkPrimaryKey = 'id';
+    public $showBulkButton = true;
     public $expandableRows = 'both';
     public $exportTitle = 'Semua Tugas Pengguna';
 
@@ -45,6 +46,7 @@ class AllTaskTable extends MrCatzDataTablesComponent
                     'Diperbarui' => 'updated_at',
                 ]);
             })
+            ->enableBulk()
             ->withColumnIndex('No')
             ->withColumn('Pengguna', 'user_name', showOn: 'desktop')
             ->withColumn('Judul', 'title')
@@ -72,7 +74,7 @@ class AllTaskTable extends MrCatzDataTablesComponent
                 $hint = $isOverdue ? ' <span class="badge badge-error badge-xs text-white ml-1">terlambat</span>' : '';
                 return '<span class="' . $class . ' whitespace-nowrap">' . $date->translatedFormat('d M Y') . '</span>' . $hint;
             }, 'due_date')
-            ->withActionColumn(editable: false, deletable: false)
+            ->withActionColumn()
             ->setDefaultOrder('created_at', 'desc');
     }
 

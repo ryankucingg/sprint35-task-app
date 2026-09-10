@@ -18,11 +18,13 @@
             <span class="menu-title text-gray-500">Menu</span>
             <ul class="nav-list menu space-y-4 px-4 mt-4 w-full">
                 <x-ui.navigation-item session-active="admin-dashboard" link="{{ route('admin.dashboard') }}" name="Dashboard" icon="dashboard"/>
-                @include('livewire.task.task_nav')
+                @unless(auth()->user()->isAdmin())
+                    @include('livewire.task.task_nav')
+                @endunless
             </ul>
         </div>
 
-        @if(auth()->user()->isSuperAdmin())
+        @if(auth()->user()->isAdmin())
             <div class="divider"></div>
 
             <div class="menu-group -mx-4">

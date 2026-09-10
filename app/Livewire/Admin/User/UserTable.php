@@ -81,8 +81,8 @@ class UserTable extends MrCatzDataTablesComponent
 
             ->withCustomColumn("Role", function ($data, $i) {
                 $roleLabel = str_replace('-', ' ', $data->role);
-                $badgeClass = $data->role === 'super-admin' ? 'badge-primary' : 'badge-secondary';
-                return '<span class="badge ' . $badgeClass . ' badge-sm text-white uppercase whitespace-nowrap truncate max-w-full">' . $roleLabel . '</span>';
+                $badgeClass = $data->role === 'admin' ? 'badge-primary' : 'badge-ghost border border-base-content/15';
+                return '<span class="badge ' . $badgeClass . ' badge-sm uppercase whitespace-nowrap truncate max-w-full' . ($data->role === 'admin' ? ' text-white' : '') . '">' . $roleLabel . '</span>';
             }, 'role', false)
             ->withActionColumn();
     }
@@ -90,8 +90,8 @@ class UserTable extends MrCatzDataTablesComponent
     public function setFilter()
     {
         $roles = [
-            ['value' => 'super-admin', 'label' => 'Super Admin'],
             ['value' => 'admin', 'label' => 'Admin'],
+            ['value' => 'user', 'label' => 'User'],
         ];
 
         $roleFilter = MrCatzDataTableFilter::create(

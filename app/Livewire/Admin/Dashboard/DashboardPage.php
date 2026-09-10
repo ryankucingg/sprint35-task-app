@@ -19,13 +19,19 @@ class DashboardPage extends MrCatzComponent
         ];
     }
 
+    private function scope()
+    {
+        return Auth::user()->isAdmin()
+            ? Task::query()
+            : Task::where('user_id', Auth::id());
+    }
+
     private function stats(): array
     {
-        $userId = Auth::id();
         $today = Carbon::today()->toDateString();
         $nextWeek = Carbon::today()->addDays(7)->toDateString();
 
-        $base = Task::where('user_id', $userId);
+        $base = $this->scope();
 
         return [
             'total' => (clone $base)->count(),
@@ -49,8 +55,8 @@ class DashboardPage extends MrCatzComponent
         $today = Carbon::today();
         $nextWeek = Carbon::today()->addDays(7)->endOfDay();
 
-        return Task::with('category')
-            ->where('user_id', Auth::id())
+        return $this->scope()
+            ->with(['category', 'user'])
             ->where('status', '!=', Task::STATUS_SELESAI)
             ->whereNotNull('due_date')
             ->whereDate('due_date', '<=', $nextWeek)
@@ -76,6 +82,7 @@ class DashboardPage extends MrCatzComponent
                 return (object) [
                     'id' => $task->id,
                     'title' => $task->title,
+                    'owner' => Auth::user()->isAdmin() ? $task->user?->name : null,
                     'priority' => $task->priority,
                     'status' => $task->status,
                     'category' => $task->category?->name,
@@ -115,7 +122,7 @@ class DashboardPage extends MrCatzComponent
                 'labels' => array_values(Task::STATUSES),
                 'series' => [$stats['belum'], $stats['dikerjakan'], $stats['selesai']],
             ],
-            'perUser' => Auth::user()->isSuperAdmin() ? $this->perUserStats() : null,
+            'perUser' => Auth::user()->isAdmin() ? $this->perUserStats() : null,
         ])->layout('components.layouts.admin_layout');
     }
 }

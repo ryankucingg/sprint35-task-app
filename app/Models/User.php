@@ -31,14 +31,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function isSuperAdmin(): bool
-    {
-        return $this->role === 'super-admin';
-    }
-
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'super-admin']);
+        return $this->role === 'admin';
     }
 
     public function tasks(): HasMany

@@ -20,7 +20,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'super-admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
 
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);

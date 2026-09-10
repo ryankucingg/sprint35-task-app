@@ -44,12 +44,12 @@ class UserPage extends MrCatzComponent
             ),
             MrCatzFormField::select('role', label: 'Role',
                 data: [
+                    ['value' => 'user', 'label' => 'User'],
                     ['value' => 'admin', 'label' => 'Admin'],
-                    ['value' => 'super-admin', 'label' => 'Super Admin'],
                 ],
                 value: 'value',
                 option: 'label',
-                rules: 'required|in:admin,super-admin',
+                rules: 'required|in:user,admin',
                 messages: ['required' => 'Silahkan pilih role yang valid'],
             ),
             MrCatzFormField::password('password', label: $this->isEdit ? 'Password (kosongkan jika tidak diubah)' : 'Password',
@@ -81,7 +81,7 @@ class UserPage extends MrCatzComponent
         $this->name = "";
         $this->username = "";
         $this->email = "";
-        $this->role = "admin";
+        $this->role = "user";
         $this->password = "";
         $this->password_confirmation = "";
         $this->oldUsername = null;
@@ -117,11 +117,6 @@ class UserPage extends MrCatzComponent
             $this->getFormValidationMessages()
         );
 
-        if ($this->role === 'super-admin' && !Auth::user()->isSuperAdmin()) {
-            $this->show_notif('error', 'Hanya Super Admin yang dapat menetapkan role Super Admin!');
-            return;
-        }
-
         if (!$this->isEdit && empty($this->password)) {
             $this->addError('password', 'Password wajib diisi untuk user baru');
             return;
@@ -144,8 +139,13 @@ class UserPage extends MrCatzComponent
         if ($this->isEdit) {
             $user = User::find($this->id);
 
-            if ($user->isSuperAdmin() && !Auth::user()->isSuperAdmin()) {
-                $this->show_notif('error', 'Anda tidak memiliki izin untuk mengedit Super Admin!');
+            if ($user->isAdmin() && $this->role !== 'admin' && $this->isLastAdmin($user->id)) {
+                $this->show_notif('error', 'Tidak dapat menurunkan role admin terakhir!');
+                return;
+            }
+
+            if ($user->id === Auth::id() && $this->role !== 'admin') {
+                $this->show_notif('error', 'Tidak dapat menurunkan role akun Anda sendiri!');
                 return;
             }
 
@@ -205,8 +205,8 @@ class UserPage extends MrCatzComponent
             return;
         }
 
-        if ($user->isSuperAdmin() && !Auth::user()->isSuperAdmin()) {
-            $this->show_notif('error', 'Anda tidak memiliki izin untuk menghapus Super Admin!');
+        if ($user->isAdmin() && $this->isLastAdmin($user->id)) {
+            $this->show_notif('error', 'Tidak dapat menghapus admin terakhir!');
             return;
         }
 
@@ -225,22 +225,18 @@ class UserPage extends MrCatzComponent
         if (empty($selectedRows)) return;
 
         $currentUserId = Auth::id();
-        $isSuperAdmin = Auth::user()->isSuperAdmin();
 
         if (in_array((string) $currentUserId, $selectedRows)) {
             $this->show_notif('error', 'Tidak dapat menghapus akun yang sedang Anda pakai!');
             return;
         }
 
-        if (!$isSuperAdmin) {
-            $hasSuperAdmin = User::whereIn('id', $selectedRows)
-                ->where('role', 'super-admin')
-                ->exists();
+        $adminCount = User::where('role', 'admin')->count();
+        $selectedAdmins = User::whereIn('id', $selectedRows)->where('role', 'admin')->count();
 
-            if ($hasSuperAdmin) {
-                $this->show_notif('error', 'Anda tidak memiliki izin untuk menghapus Super Admin!');
-                return;
-            }
+        if ($selectedAdmins >= $adminCount && $selectedAdmins > 0) {
+            $this->show_notif('error', 'Tidak dapat menghapus seluruh admin sekaligus!');
+            return;
         }
 
         $count = User::whereIn('id', $selectedRows)->delete();
@@ -299,5 +295,10 @@ class UserPage extends MrCatzComponent
             return false;
         }
         return true;
+    }
+
+    private function isLastAdmin($userId): bool
+    {
+        return User::where('role', 'admin')->where('id', '!=', $userId)->doesntExist();
     }
 }

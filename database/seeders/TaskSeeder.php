@@ -10,13 +10,12 @@ class TaskSeeder extends Seeder
 {
     public function run(): void
     {
-        $superAdmin = User::where('username', 'super-admin')->first();
-        $admin1 = User::where('username', 'admin-1')->first();
-        $admin2 = User::where('username', 'admin-2')->first();
+        $user1 = User::where('username', 'user-1')->first();
+        $user2 = User::where('username', 'user-2')->first();
 
         $tasks = [
             [
-                'user' => $superAdmin,
+                'user' => $user1,
                 'title' => 'Menyusun laporan bulanan',
                 'description' => 'Rangkum capaian kerja bulan ini beserta lampiran data pendukung.',
                 'category_id' => 1,
@@ -25,7 +24,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(2)->toDateString(),
             ],
             [
-                'user' => $superAdmin,
+                'user' => $user2,
                 'title' => 'Review proposal vendor',
                 'description' => 'Cek kelengkapan dokumen dan bandingkan penawaran harga.',
                 'category_id' => 1,
@@ -34,7 +33,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(6)->toDateString(),
             ],
             [
-                'user' => $superAdmin,
+                'user' => $user1,
                 'title' => 'Backup data server',
                 'description' => null,
                 'category_id' => 5,
@@ -43,7 +42,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->subDays(3)->toDateString(),
             ],
             [
-                'user' => $superAdmin,
+                'user' => $user2,
                 'title' => 'Menyiapkan materi briefing',
                 'description' => 'Slide ringkas untuk briefing tim awal pekan.',
                 'category_id' => 4,
@@ -52,7 +51,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->subDays(1)->toDateString(),
             ],
             [
-                'user' => $superAdmin,
+                'user' => $user1,
                 'title' => 'Belajar Laravel Livewire',
                 'description' => 'Selesaikan modul komponen dan event.',
                 'category_id' => 3,
@@ -61,7 +60,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(12)->toDateString(),
             ],
             [
-                'user' => $admin1,
+                'user' => $user1,
                 'title' => 'Update data pelanggan',
                 'description' => 'Perbarui kontak dan alamat pelanggan aktif.',
                 'category_id' => 1,
@@ -70,7 +69,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->toDateString(),
             ],
             [
-                'user' => $admin1,
+                'user' => $user1,
                 'title' => 'Menjawab email klien',
                 'description' => 'Balas pertanyaan estimasi biaya dari dua klien.',
                 'category_id' => 1,
@@ -79,7 +78,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(1)->toDateString(),
             ],
             [
-                'user' => $admin1,
+                'user' => $user1,
                 'title' => 'Rapikan arsip dokumen',
                 'description' => null,
                 'category_id' => 5,
@@ -88,7 +87,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->subDays(5)->toDateString(),
             ],
             [
-                'user' => $admin1,
+                'user' => $user1,
                 'title' => 'Membuat konsep konten medsos',
                 'description' => 'Draft tiga konten untuk pekan depan.',
                 'category_id' => 2,
@@ -97,7 +96,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->subDays(2)->toDateString(),
             ],
             [
-                'user' => $admin2,
+                'user' => $user2,
                 'title' => 'Menyiapkan notulen rapat',
                 'description' => 'Rapat koordinasi mingguan bersama seluruh divisi.',
                 'category_id' => 4,
@@ -106,7 +105,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(3)->toDateString(),
             ],
             [
-                'user' => $admin2,
+                'user' => $user2,
                 'title' => 'Cek perangkat kantor',
                 'description' => 'Inventaris kondisi printer dan komputer.',
                 'category_id' => 5,
@@ -115,7 +114,7 @@ class TaskSeeder extends Seeder
                 'due_date' => now()->addDays(9)->toDateString(),
             ],
             [
-                'user' => $admin2,
+                'user' => $user2,
                 'title' => 'Kursus online manajemen waktu',
                 'description' => 'Selesaikan dua modul pertama.',
                 'category_id' => 3,

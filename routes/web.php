@@ -20,12 +20,12 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/', DashboardPage::class)->name('dashboard');
     Route::get('/tasks', TaskPage::class)->name('tasks');
     Route::get('/profile', ProfilePage::class)->name('profile');
 
-    Route::middleware('super-admin')->group(function () {
+    Route::middleware('admin')->group(function () {
         Route::get('/all-tasks', AllTaskPage::class)->name('all-tasks');
         Route::get('/categories', CategoryPage::class)->name('categories');
         Route::get('/users', UserPage::class)->name('users');

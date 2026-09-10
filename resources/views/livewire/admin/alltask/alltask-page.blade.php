@@ -8,6 +8,8 @@
 
     <livewire:admin.alltask.alltask-table/>
 
+    @include('livewire.admin.alltask.alltask_form')
+
 </div>
 
 @include('mrcatz::components.ui.datatable-scripts')

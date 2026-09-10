@@ -62,6 +62,10 @@ class TaskPage extends MrCatzComponent
 
     public function mount()
     {
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.all-tasks');
+        }
+
         $this->setTitle('Tugas Saya');
         session()->put('active', 'admin-tasks');
         $this->breadcrumbs = [

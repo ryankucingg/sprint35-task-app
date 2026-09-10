@@ -28,17 +28,6 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (!Auth::user()->isAdmin()) {
-                Log::warning('Login denied: user has no admin access', [
-                    'username' => $credentials['username'],
-                    'ip' => $request->ip(),
-                ]);
-                Auth::logout();
-                return back()->withErrors([
-                    'username' => 'Akun Anda tidak memiliki akses administrator.',
-                ])->onlyInput('username');
-            }
-
             Log::info('Login successful', [
                 'user_id' => Auth::id(),
                 'username' => Auth::user()->username,

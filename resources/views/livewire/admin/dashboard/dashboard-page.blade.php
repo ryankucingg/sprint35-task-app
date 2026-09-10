@@ -27,20 +27,21 @@
         <div>
             <h1 class="text-2xl font-bold text-base-content">Halo, {{ auth()->user()->name }}</h1>
             <p class="text-sm text-base-content/50 mt-1">
-                Ringkasan tugas Anda hari ini, {{ now()->locale('id')->translatedFormat('l, d F Y') }}
+                {{ (auth()->user()->isAdmin() ? 'Ringkasan seluruh tugas pengguna, ' : 'Ringkasan tugas Anda hari ini, ') . now()->locale('id')->translatedFormat('l, d F Y') }}
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            @if(auth()->user()->isSuperAdmin())
-                <a href="{{ route('admin.all-tasks') }}" class="btn btn-ghost btn-sm gap-1.5">
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.all-tasks') }}" class="btn btn-primary btn-sm gap-1.5">
                     <span class="material-symbols-outlined text-base">assignment</span>
-                    Semua Tugas
+                    Kelola Semua Tugas
+                </a>
+            @else
+                <a href="{{ route('admin.tasks') }}" class="btn btn-primary btn-sm gap-1.5">
+                    <span class="material-symbols-outlined text-base">checklist</span>
+                    Kelola Tugas Saya
                 </a>
             @endif
-            <a href="{{ route('admin.tasks') }}" class="btn btn-primary btn-sm gap-1.5">
-                <span class="material-symbols-outlined text-base">checklist</span>
-                Kelola Tugas Saya
-            </a>
         </div>
     </div>
 
@@ -52,11 +53,15 @@
                 </div>
                 <h3 class="text-lg font-bold text-base-content">Belum ada tugas</h3>
                 <p class="text-sm text-base-content/50 mb-4 max-w-sm">
-                    Mulai catat pekerjaan Anda — tetapkan prioritas dan tenggat waktu agar mudah dipantau.
+                    @if(auth()->user()->isAdmin())
+                        Belum ada tugas yang tercatat untuk para pengguna. Buatkan tugas pertama untuk mulai memantau pekerjaan mereka.
+                    @else
+                        Mulai catat pekerjaan Anda — tetapkan prioritas dan tenggat waktu agar mudah dipantau.
+                    @endif
                 </p>
-                <a href="{{ route('admin.tasks') }}" class="btn btn-primary btn-sm gap-1.5">
+                <a href="{{ route(auth()->user()->isAdmin() ? 'admin.all-tasks' : 'admin.tasks') }}" class="btn btn-primary btn-sm gap-1.5">
                     <span class="material-symbols-outlined text-base">add_task</span>
-                    Tambah Tugas Pertama
+                    {{ auth()->user()->isAdmin() ? 'Buatkan Tugas untuk Pengguna' : 'Tambah Tugas Pertama' }}
                 </a>
             </div>
         </div>
@@ -120,6 +125,10 @@
                                             <span class="{{ $tone['text'] }} font-semibold">{{ $task->relative }}</span>
                                             <span class="text-base-content/30">•</span>
                                             <span>{{ $task->due_label }}</span>
+                                            @if($task->owner)
+                                                <span class="text-base-content/30">•</span>
+                                                <span class="font-medium text-base-content/70">{{ $task->owner }}</span>
+                                            @endif
                                             @if($task->category)
                                                 <span class="text-base-content/30">•</span>
                                                 <span>{{ $task->category }}</span>

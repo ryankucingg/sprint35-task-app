@@ -27,7 +27,7 @@
         </x-ui.input>
 
         <x-ui.select id="role"
-                      :data="[['value' => 'admin', 'label' => 'Admin'], ['value' => 'super-admin', 'label' => 'Super Admin']]"
+                      :data="[['value' => 'user', 'label' => 'User'], ['value' => 'admin', 'label' => 'Admin']]"
                       value="value"
                       option="label"
                       label="Role"
