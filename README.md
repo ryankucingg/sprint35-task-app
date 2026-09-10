@@ -9,6 +9,7 @@ Aplikasi manajemen tugas berbasis web: setiap pengguna mencatat dan memantau tug
 - **Tailwind CSS 4** — utility-first CSS
 - **DaisyUI 5** — component library (tema terang/gelap)
 - **mrcatz/datatable** — datatable untuk CRUD & daftar data (search, filter, sort, export PDF/Excel)
+- **ApexCharts** — grafik pada dashboard (distribusi status, prioritas, ketepatan tenggat), dimuat via CDN
 - **MySQL** — database
 - **Vite** — build tool aset frontend
 

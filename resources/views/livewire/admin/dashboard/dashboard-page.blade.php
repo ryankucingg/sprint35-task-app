@@ -17,6 +17,14 @@
         'warning' => ['bg' => 'bg-warning/10', 'text' => 'text-warning'],
         'info' => ['bg' => 'bg-info/10', 'text' => 'text-info'],
     ];
+
+    $pctSelesai = $stats['total'] > 0 ? round($stats['selesai'] / $stats['total'] * 100) : 0;
+
+    $progressBars = [
+        ['Belum Dimulai', $stats['belum'], 'bg-base-content/30'],
+        ['Dikerjakan', $stats['dikerjakan'], 'bg-warning'],
+        ['Selesai', $stats['selesai'], 'bg-success'],
+    ];
 @endphp
 
 <div class="grid-row p-4 sm:p-6">
@@ -83,8 +91,8 @@
             @endforeach
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-5">
-            <div class="lg:col-span-2 card bg-base-100 shadow-sm border border-base-200">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+            <div class="card bg-base-100 shadow-sm border border-base-200">
                 <div class="card-body p-4 sm:p-5">
                     <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
                         <span class="material-symbols-outlined text-primary text-base">donut_large</span>
@@ -94,42 +102,42 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="card bg-base-100 shadow-sm border border-base-200">
-                    <div class="card-body p-4 sm:p-5">
-                        <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
-                            <span class="material-symbols-outlined text-primary text-base">low_priority</span>
-                            Prioritas Tugas
-                        </h3>
-                        <div id="priority-bar"></div>
-                    </div>
-                </div>
-
-                <div class="card bg-base-100 shadow-sm border border-base-200">
-                    <div class="card-body p-4 sm:p-5">
-                        <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
-                            <span class="material-symbols-outlined text-primary text-base">schedule</span>
-                            Ketepatan Tenggat
-                        </h3>
-                        <div id="timely-bar"></div>
-                    </div>
+            <div class="card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body p-4 sm:p-5">
+                    <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-base">low_priority</span>
+                        Prioritas Tugas
+                    </h3>
+                    <div id="priority-bar"></div>
                 </div>
             </div>
 
-            <div class="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
+            <div class="card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body p-4 sm:p-5">
+                    <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-base">schedule</span>
+                        Ketepatan Tenggat
+                    </h3>
+                    <div id="timely-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+            <div class="lg:col-span-2 card bg-base-100 shadow-sm border border-base-200">
                 <div class="card-body p-4 sm:p-5">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2">
                             <span class="material-symbols-outlined text-primary text-base">hourglass_top</span>
                             Tugas Mendekati Tenggat
                         </h3>
-                        <a href="{{ route('admin.tasks') }}" class="btn btn-ghost btn-xs text-base-content/50">
+                        <a href="{{ route(auth()->user()->isAdmin() ? 'admin.all-tasks' : 'admin.tasks') }}" class="btn btn-ghost btn-xs text-base-content/50">
                             Lihat semua
                         </a>
                     </div>
 
                     @if($upcoming->isEmpty())
-                        <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <div class="flex flex-col items-center justify-center py-14 text-center">
                             <span class="material-symbols-outlined text-success/60 mb-2" style="font-size: 36px;">celebration</span>
                             <p class="text-sm text-base-content/50">Tidak ada tugas mendekati tenggat. Kerja rapi!</p>
                         </div>
@@ -164,6 +172,41 @@
                             @endforeach
                         </ul>
                     @endif
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-sm border border-base-200">
+                <div class="card-body p-4 sm:p-5 flex flex-col">
+                    <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-primary text-base">data_usage</span>
+                        Progres Penyelesaian
+                    </h3>
+
+                    <div class="flex flex-col items-center py-3">
+                        <div class="radial-progress text-success"
+                             style="--value:{{ $pctSelesai }}; --size: 7.5rem; --thickness: 0.55rem;"
+                             role="progressbar" aria-valuenow="{{ $pctSelesai }}">
+                            <span class="text-2xl font-extrabold text-base-content">{{ $pctSelesai }}%</span>
+                        </div>
+                        <p class="text-xs text-base-content/50 mt-2">
+                            {{ $stats['selesai'] }} dari {{ $stats['total'] }} tugas selesai
+                        </p>
+                    </div>
+
+                    <div class="mt-auto space-y-3 pt-3">
+                        @foreach($progressBars as [$label, $count, $barColor])
+                            @php $width = $stats['total'] > 0 ? round($count / $stats['total'] * 100) : 0; @endphp
+                            <div>
+                                <div class="flex items-center justify-between text-xs mb-1">
+                                    <span class="text-base-content/60 font-medium">{{ $label }}</span>
+                                    <span class="font-semibold text-base-content">{{ $count }}</span>
+                                </div>
+                                <div class="h-1.5 rounded-full bg-base-200 overflow-hidden">
+                                    <div class="h-full rounded-full {{ $barColor }} transition-all" style="width: {{ $width }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -282,7 +325,7 @@
                         instances.donut = new ApexCharts(donutEl, {
                             chart: {
                                 type: 'donut',
-                                height: 320,
+                                height: 260,
                                 fontFamily: 'inherit',
                                 background: 'transparent',
                                 toolbar: { show: false },
@@ -303,7 +346,7 @@
                     var priorityEl = document.getElementById('priority-bar');
                     if (priorityEl) {
                         instances.priority = new ApexCharts(priorityEl, {
-                            ...base(150),
+                            ...base(260),
                             series: [{ name: 'Tugas', data: priorityData.series }],
                             colors: ['#7ba0cc', '#d3b56a', '#cd7f89'],
                             xaxis: { categories: priorityData.labels, axisTicks: { show: false } },
@@ -314,7 +357,7 @@
                     var timelyEl = document.getElementById('timely-bar');
                     if (timelyEl) {
                         instances.timely = new ApexCharts(timelyEl, {
-                            ...base(150),
+                            ...base(260),
                             series: [{ name: 'Tugas', data: timelyData.series }],
                             colors: ['#7cb98c', '#cd7f89'],
                             xaxis: { categories: timelyData.labels, axisTicks: { show: false } },
