@@ -10,6 +10,8 @@
 
     @include('livewire.task.task_form')
 
+    @include('livewire.task.detail_modal')
+
 </div>
 
 @include('mrcatz::components.ui.datatable-scripts')

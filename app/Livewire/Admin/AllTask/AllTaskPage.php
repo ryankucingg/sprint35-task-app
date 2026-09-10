@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 use MrCatz\DataTable\MrCatzComponent;
 use MrCatz\DataTable\MrCatzFormField;
 
@@ -19,6 +20,9 @@ class AllTaskPage extends MrCatzComponent
     public $priority;
     public $status;
     public $due_date;
+
+    public $showDetailModal = false;
+    public $detailTask = null;
 
     public function setForm(): array
     {
@@ -223,5 +227,30 @@ class AllTaskPage extends MrCatzComponent
             'status' => true,
             'text' => $count . ' tugas berhasil dihapus!',
         ]);
+    }
+
+    #[On('open-task-detail')]
+    public function loadDetail($data)
+    {
+        $task = Task::with(['category', 'user'])->find($data['id'] ?? null);
+
+        if (!$task) {
+            $this->show_notif('error', 'Tugas tidak ditemukan!');
+            return;
+        }
+
+        $this->detailTask = $task;
+        $this->showDetailModal = true;
+    }
+
+    public function closeDetail()
+    {
+        $this->showDetailModal = false;
+    }
+
+    public function editFromDetail($id)
+    {
+        $this->showDetailModal = false;
+        $this->listenEditData(['id' => $id]);
     }
 }

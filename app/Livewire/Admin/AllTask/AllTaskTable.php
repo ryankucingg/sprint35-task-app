@@ -74,6 +74,11 @@ class AllTaskTable extends MrCatzDataTablesComponent
                 $hint = $isOverdue ? ' <span class="badge badge-error badge-xs text-white ml-1">terlambat</span>' : '';
                 return '<span class="' . $class . ' whitespace-nowrap">' . $date->translatedFormat('d M Y') . '</span>' . $hint;
             }, 'due_date')
+            ->withCustomColumn('Detail', function ($data, $i) {
+                return '<button class="btn btn-ghost btn-sm btn-square text-info hover:bg-info/10 transition-colors duration-200 tooltip tooltip-top" data-tip="Detail Tugas" wire:click="openDetail(' . $data->id . ')">'
+                    . '<span class="material-symbols-outlined text-lg">visibility</span>'
+                    . '</button>';
+            }, null, false, true, 'both', 'action')
             ->withActionColumn()
             ->setDefaultOrder('created_at', 'desc');
     }
@@ -101,5 +106,10 @@ class AllTaskTable extends MrCatzDataTablesComponent
     public function getRowPerPageOption()
     {
         return [10, 15, 20, 30];
+    }
+
+    public function openDetail($id)
+    {
+        $this->dispatch('open-task-detail', ['id' => $id]);
     }
 }

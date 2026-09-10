@@ -234,4 +234,36 @@ class TaskManagementTest extends TestCase
 
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
     }
+
+    public function test_user_can_open_own_task_detail_modal(): void
+    {
+        $task = Task::where('user_id', $this->userOne->id)->first();
+
+        Livewire::actingAs($this->userOne)
+            ->test(TaskPage::class)
+            ->call('loadDetail', ['id' => $task->id])
+            ->assertSet('showDetailModal', true)
+            ->assertSet('detailTask.id', $task->id);
+    }
+
+    public function test_user_cannot_open_other_users_task_detail(): void
+    {
+        $foreignTask = Task::where('user_id', $this->userTwo->id)->first();
+
+        Livewire::actingAs($this->userOne)
+            ->test(TaskPage::class)
+            ->call('loadDetail', ['id' => $foreignTask->id])
+            ->assertSet('showDetailModal', false);
+    }
+
+    public function test_admin_can_open_any_task_detail(): void
+    {
+        $task = Task::where('user_id', $this->userTwo->id)->first();
+
+        Livewire::actingAs($this->admin)
+            ->test(AllTaskPage::class)
+            ->call('loadDetail', ['id' => $task->id])
+            ->assertSet('showDetailModal', true)
+            ->assertSet('detailTask.id', $task->id);
+    }
 }

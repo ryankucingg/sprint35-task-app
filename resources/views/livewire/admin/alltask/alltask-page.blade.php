@@ -10,6 +10,8 @@
 
     @include('livewire.admin.alltask.alltask_form')
 
+    @include('livewire.task.detail_modal', ['showOwner' => true])
+
 </div>
 
 @include('mrcatz::components.ui.datatable-scripts')
