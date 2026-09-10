@@ -17,6 +17,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Default Theme
+    |--------------------------------------------------------------------------
+    |
+    | Tema awal aplikasi untuk pengunjung yang belum memilih tema sendiri.
+    | Pilihan yang didukung: "light", "dark", atau "system" (mengikuti
+    | preferensi sistem operasi). Pilihan personal pengguna yang tersimpan
+    | di browser selalu lebih diutamakan daripada nilai ini.
+    |
+    */
+
+    'default_theme' => env('DEFAULT_THEME', 'system'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

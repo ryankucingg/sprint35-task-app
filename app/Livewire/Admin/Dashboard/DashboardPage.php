@@ -111,6 +111,38 @@ class DashboardPage extends MrCatzComponent
             ->get();
     }
 
+    private function priorityStats(): array
+    {
+        $base = $this->scope();
+
+        return [
+            'labels' => array_values(Task::PRIORITIES),
+            'series' => [
+                (clone $base)->where('priority', Task::PRIORITY_RENDAH)->count(),
+                (clone $base)->where('priority', Task::PRIORITY_SEDANG)->count(),
+                (clone $base)->where('priority', Task::PRIORITY_TINGGI)->count(),
+            ],
+        ];
+    }
+
+    private function timelinessStats(): array
+    {
+        $today = Carbon::today()->toDateString();
+        $base = $this->scope()->whereNotNull('due_date');
+
+        $terlambat = (clone $base)
+            ->whereDate('due_date', '<', $today)
+            ->where('status', '!=', Task::STATUS_SELESAI)
+            ->count();
+
+        $tepatWaktu = (clone $base)->count() - $terlambat;
+
+        return [
+            'labels' => ['Tepat Waktu', 'Terlambat'],
+            'series' => [$tepatWaktu, $terlambat],
+        ];
+    }
+
     public function render()
     {
         $stats = $this->stats();
@@ -122,6 +154,8 @@ class DashboardPage extends MrCatzComponent
                 'labels' => array_values(Task::STATUSES),
                 'series' => [$stats['belum'], $stats['dikerjakan'], $stats['selesai']],
             ],
+            'priorityChart' => $this->priorityStats(),
+            'timelyChart' => $this->timelinessStats(),
             'perUser' => Auth::user()->isAdmin() ? $this->perUserStats() : null,
         ])->layout('components.layouts.admin_layout');
     }

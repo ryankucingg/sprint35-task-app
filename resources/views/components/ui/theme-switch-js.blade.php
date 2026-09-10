@@ -1,4 +1,6 @@
 <script>
+    var MRCATZ_DEFAULT_THEME = '{{ \App\Support\DefaultTheme::mode() }}';
+
     (function() {
         if (!localStorage.getItem('mrcatz-theme') && localStorage.getItem('theme')) {
             localStorage.setItem('mrcatz-theme', localStorage.getItem('theme'));
@@ -6,17 +8,17 @@
         }
         var saved = localStorage.getItem('mrcatz-theme');
         var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var mode = saved || 'system';
+        var mode = saved || MRCATZ_DEFAULT_THEME;
         if (mode !== 'mrcatz-dark' && mode !== 'mrcatz-light' && mode !== 'system') {
-            mode = 'system';
-            localStorage.setItem('mrcatz-theme', 'system');
+            mode = MRCATZ_DEFAULT_THEME;
+            localStorage.setItem('mrcatz-theme', MRCATZ_DEFAULT_THEME);
         }
         var theme = mode === 'system' ? (prefersDark ? 'mrcatz-dark' : 'mrcatz-light') : mode;
         document.documentElement.setAttribute('data-theme', theme);
     })();
 
     function getThemeMode() {
-        return localStorage.getItem('mrcatz-theme') || 'system';
+        return localStorage.getItem('mrcatz-theme') || MRCATZ_DEFAULT_THEME;
     }
 
     function resolveTheme(mode) {

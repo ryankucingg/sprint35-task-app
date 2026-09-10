@@ -18,9 +18,9 @@
     --color-base-content: #1e2a3f;
     --color-primary: #0b2a59;
     --color-primary-content: #ffffff;
-    --color-secondary: #ea001b;
+    --color-secondary: #cc4f5c;
     --color-secondary-content: #ffffff;
-    --color-accent: #1d4ed8;
+    --color-accent: #2c5fae;
     --color-accent-content: #ffffff;
     --color-neutral: #edf1f7;
     --color-neutral-content: #3a4a63;
@@ -47,22 +47,22 @@
     default: false;
     prefersdark: true;
     color-scheme: dark;
-    --color-base-100: #0b1c36;
-    --color-base-200: #08152b;
-    --color-base-300: #060f1e;
-    --color-base-content: #c9d5e8;
-    --color-primary: #4a82da;
+    --color-base-100: #0f1b2e;
+    --color-base-200: #0c1626;
+    --color-base-300: #091120;
+    --color-base-content: #c2cee0;
+    --color-primary: #5d84b4;
     --color-primary-content: #ffffff;
-    --color-secondary: #ff4155;
+    --color-secondary: #c76e78;
     --color-secondary-content: #ffffff;
-    --color-accent: #7eb1f5;
-    --color-accent-content: #0b1c36;
-    --color-neutral: #0d1f3c;
-    --color-neutral-content: #8fa3c4;
-    --color-info: #7eb1f5;
-    --color-success: #4ade80;
-    --color-warning: #facc15;
-    --color-error: #f87171;
+    --color-accent: #8aa8d4;
+    --color-accent-content: #0f1b2e;
+    --color-neutral: #13233a;
+    --color-neutral-content: #93a5c0;
+    --color-info: #7ba0cc;
+    --color-success: #7cb98c;
+    --color-warning: #cdb45e;
+    --color-error: #cd7f89;
     --rounded-box: 1rem;
     --rounded-btn: 0.5rem;
     --rounded-badge: 1.9rem;
@@ -82,7 +82,7 @@
     --color-brand-navy: #0b2a59;
     --color-brand-navy-deep: #061733;
     --color-brand-red: #ea001b;
-    --color-brand-red-soft: #ff5a6b;
+    --color-brand-red-soft: #d98f99;
 }
 
 .app-sidebar {

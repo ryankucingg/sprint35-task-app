@@ -94,6 +94,28 @@
                 </div>
             </div>
 
+            <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="card bg-base-100 shadow-sm border border-base-200">
+                    <div class="card-body p-4 sm:p-5">
+                        <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary text-base">low_priority</span>
+                            Prioritas Tugas
+                        </h3>
+                        <div id="priority-bar"></div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 shadow-sm border border-base-200">
+                    <div class="card-body p-4 sm:p-5">
+                        <h3 class="text-sm font-semibold text-base-content/80 flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary text-base">schedule</span>
+                            Ketepatan Tenggat
+                        </h3>
+                        <div id="timely-bar"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
                 <div class="card-body p-4 sm:p-5">
                     <div class="flex items-center justify-between mb-3">
@@ -213,38 +235,92 @@
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script>
             (function () {
-                var el = document.getElementById('status-donut');
-                if (!el) return;
-                var data = @json($chart);
+                var statusData = @json($chart);
+                var priorityData = @json($priorityChart);
+                var timelyData = @json($timelyChart);
+                var instances = {};
 
                 function isDark() {
                     return (document.documentElement.getAttribute('data-theme') || '').includes('dark');
                 }
 
-                function render() {
-                    if (window.dashDonut) {
-                        window.dashDonut.destroy();
-                    }
+                function chrome() {
+                    return {
+                        theme: { mode: isDark() ? 'dark' : 'light' },
+                        grid: { borderColor: isDark() ? '#243247' : '#eef1f6' },
+                        foreColor: isDark() ? '#c2cee0' : '#5a6a84',
+                    };
+                }
 
-                    window.dashDonut = new ApexCharts(el, {
+                function base(height) {
+                    var c = chrome();
+                    return {
                         chart: {
-                            type: 'donut',
-                            height: 265,
+                            type: 'bar',
+                            height: height,
                             fontFamily: 'inherit',
                             background: 'transparent',
                             toolbar: { show: false },
                         },
-                        theme: { mode: isDark() ? 'dark' : 'light' },
-                        labels: data.labels,
-                        series: data.series,
-                        colors: ['#94a3b8', '#f59e0b', '#22c55e'],
-                        legend: { position: 'bottom', fontSize: '12px' },
+                        theme: c.theme,
+                        grid: c.grid,
+                        foreColor: c.foreColor,
+                        plotOptions: {
+                            bar: { borderRadius: 6, barHeight: '60%', distributed: true },
+                        },
                         dataLabels: { enabled: true },
-                        stroke: { width: 0 },
-                        plotOptions: { pie: { donut: { size: '68%' } } },
-                        noData: { text: 'Belum ada tugas' },
-                    });
-                    window.dashDonut.render();
+                        xaxis: { axisTicks: { show: false } },
+                        legend: { show: false },
+                    };
+                }
+
+                function render() {
+                    Object.values(instances).forEach(function (chart) { chart.destroy(); });
+
+                    var donutEl = document.getElementById('status-donut');
+                    if (donutEl) {
+                        instances.donut = new ApexCharts(donutEl, {
+                            chart: {
+                                type: 'donut',
+                                height: 320,
+                                fontFamily: 'inherit',
+                                background: 'transparent',
+                                toolbar: { show: false },
+                            },
+                            theme: chrome().theme,
+                            labels: statusData.labels,
+                            series: statusData.series,
+                            colors: ['#9aa8bd', '#d3b56a', '#7cb98c'],
+                            legend: { position: 'bottom', fontSize: '12px' },
+                            dataLabels: { enabled: true },
+                            stroke: { width: 0 },
+                            plotOptions: { pie: { donut: { size: '68%' } } },
+                            noData: { text: 'Belum ada tugas' },
+                        });
+                        instances.donut.render();
+                    }
+
+                    var priorityEl = document.getElementById('priority-bar');
+                    if (priorityEl) {
+                        instances.priority = new ApexCharts(priorityEl, {
+                            ...base(150),
+                            series: [{ name: 'Tugas', data: priorityData.series }],
+                            colors: ['#7ba0cc', '#d3b56a', '#cd7f89'],
+                            xaxis: { categories: priorityData.labels, axisTicks: { show: false } },
+                        });
+                        instances.priority.render();
+                    }
+
+                    var timelyEl = document.getElementById('timely-bar');
+                    if (timelyEl) {
+                        instances.timely = new ApexCharts(timelyEl, {
+                            ...base(150),
+                            series: [{ name: 'Tugas', data: timelyData.series }],
+                            colors: ['#7cb98c', '#cd7f89'],
+                            xaxis: { categories: timelyData.labels, axisTicks: { show: false } },
+                        });
+                        instances.timely.render();
+                    }
                 }
 
                 function boot() {
