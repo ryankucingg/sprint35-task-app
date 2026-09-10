@@ -27,7 +27,7 @@ return [
     |
     */
 
-    'default_theme' => env('DEFAULT_THEME', 'system'),
+    'default_theme' => env('DEFAULT_THEME', 'light'),
 
     /*
     |--------------------------------------------------------------------------
