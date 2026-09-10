@@ -6,7 +6,7 @@
 
     @include('mrcatz::components.ui.breadcrumbs')
 
-    <livewire:admin.alltask.alltask-table/>
+    <livewire:admin.all-task.all-task-table/>
 
     @include('livewire.admin.alltask.alltask_form')
 
