@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mrcatz-template-app
+    container_name: sprint35-task-app
     restart: unless-stopped
     environment:
       PHP_OPCACHE_ENABLE: "1"

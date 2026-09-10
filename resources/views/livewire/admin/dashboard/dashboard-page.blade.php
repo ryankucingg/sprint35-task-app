@@ -333,7 +333,7 @@
                             theme: chrome().theme,
                             labels: statusData.labels,
                             series: statusData.series,
-                            colors: ['#9aa8bd', '#d3b56a', '#7cb98c'],
+                            colors: ['#8593ab', '#d0aa48', '#57a573'],
                             legend: { position: 'bottom', fontSize: '12px' },
                             dataLabels: { enabled: true },
                             stroke: { width: 0 },
@@ -348,7 +348,7 @@
                         instances.priority = new ApexCharts(priorityEl, {
                             ...base(260),
                             series: [{ name: 'Tugas', data: priorityData.series }],
-                            colors: ['#7ba0cc', '#d3b56a', '#cd7f89'],
+                            colors: ['#5e8fc7', '#d0aa48', '#c96a76'],
                             xaxis: { categories: priorityData.labels, axisTicks: { show: false } },
                         });
                         instances.priority.render();
@@ -359,7 +359,7 @@
                         instances.timely = new ApexCharts(timelyEl, {
                             ...base(260),
                             series: [{ name: 'Tugas', data: timelyData.series }],
-                            colors: ['#7cb98c', '#cd7f89'],
+                            colors: ['#57a573', '#c96a76'],
                             xaxis: { categories: timelyData.labels, axisTicks: { show: false } },
                         });
                         instances.timely.render();
