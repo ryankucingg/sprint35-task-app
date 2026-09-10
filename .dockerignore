@@ -1,0 +1,54 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dependencies — installed in the build stages
+node_modules
+vendor
+
+# Build artifacts — produced fresh in stage 2
+public/build
+public/hot
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# IDE & OS
+.vscode
+.idea
+.DS_Store
+*.swp
+*.swo
+
+# Logs & framework cache
+storage/logs/*
+!storage/logs/.gitignore
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+bootstrap/cache/*.php
+
+# Local sqlite database — created in the runtime volume
+database/database.sqlite
+database/*.sqlite-journal
+
+# Tests & dev tooling
+tests
+phpunit.xml
+.phpunit.cache
+.phpunit.result.cache
+.phpactor.json
+.editorconfig
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Docs
+README.md
+*.md
